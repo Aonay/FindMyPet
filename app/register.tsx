@@ -1,53 +1,48 @@
-import * as Location from "expo-location";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PrimaryButton } from "./components/PrimaryButton";
 import { TextInputField } from "./components/TextInputField";
 import { colors, spacing, typography } from "./constants/theme";
 import { useAuth } from "./context/AuthContext";
-import { loginUser } from "./services/database";
+import { registerUser } from "./services/database";
 
-export default function LoginScreen() {
+export default function RegisterScreen() {
   const router = useRouter();
   const { login } = useAuth();
+  const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
   const [senha, setSenha] = useState("");
+  const [confirma, setConfirma] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async () => {
-    if (!email || !senha) {
-      Alert.alert("Erro", "Preencha email e senha");
+  const handleRegister = async () => {
+    if (!nome || !email || !cpf || !senha || !confirma) {
+      Alert.alert("Erro", "Preencha todos os campos");
+      return;
+    }
+    if (senha !== confirma) {
+      Alert.alert("Erro", "Senhas nao coincidem");
       return;
     }
 
     setIsLoading(true);
     try {
-      const user = await loginUser(email, senha);
+      const user = await registerUser(nome, email, cpf, senha);
       if (user) {
         await login(user);
-
-        // Request location permission after successful login
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert(
-            "Permissão de localização",
-            "Para usar todos os recursos do app, precisamos acessar sua localização"
-          );
-        }
-
         router.replace("/home");
       }
     } catch (err: any) {
-      Alert.alert("Erro ao fazer login", err.message || "Tente novamente");
+      Alert.alert("Erro ao cadastrar", err.message || "Tente novamente");
     } finally {
       setIsLoading(false);
     }
@@ -55,14 +50,27 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
-        <Text style={styles.title}>LOGIN</Text>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>CADASTRO</Text>
+        <TextInputField
+          placeholder="Nome"
+          value={nome}
+          onChangeText={setNome}
+          editable={!isLoading}
+        />
         <TextInputField
           placeholder="Email"
-          autoCapitalize="none"
           keyboardType="email-address"
+          autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
+          editable={!isLoading}
+        />
+        <TextInputField
+          placeholder="CPF"
+          keyboardType="number-pad"
+          value={cpf}
+          onChangeText={setCpf}
           editable={!isLoading}
         />
         <TextInputField
@@ -72,19 +80,23 @@ export default function LoginScreen() {
           onChangeText={setSenha}
           editable={!isLoading}
         />
-        <TouchableOpacity disabled={isLoading}>
-          <Text style={styles.linkMuted}>Esqueci minha senha</Text>
-        </TouchableOpacity>
+        <TextInputField
+          placeholder="Confirmacao"
+          secureTextEntry
+          value={confirma}
+          onChangeText={setConfirma}
+          editable={!isLoading}
+        />
         <PrimaryButton
-          label={isLoading ? "Entrando..." : "Entrar"}
-          onPress={handleLogin}
-          style={styles.primaryButton}
+          label={isLoading ? "Cadastrando..." : "Cadastrar"}
+          onPress={handleRegister}
+          style={styles.submit}
         />
         {isLoading && <ActivityIndicator color={colors.primary} />}
-        <Link href="/register" style={styles.link}>
-          Cadastre-se
+        <Link href="/" style={styles.link}>
+          Entrar
         </Link>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -95,25 +107,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   container: {
-    flex: 1,
     padding: spacing.xl,
-    justifyContent: "center",
     gap: spacing.md,
   },
   title: {
     textAlign: "center",
     fontSize: typography.title,
-    color: colors.primary,
     fontWeight: "700",
+    color: colors.info,
     marginBottom: spacing.lg,
   },
-  linkMuted: {
-    fontSize: typography.caption,
-    color: colors.text,
-    textAlign: "center",
-  },
-  primaryButton: {
-    marginTop: spacing.md,
+  submit: {
+    marginTop: spacing.lg,
   },
   link: {
     textAlign: "center",

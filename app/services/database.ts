@@ -1,0 +1,337 @@
+import * as Crypto from "expo-crypto";
+import { supabase } from "./supabaseClient";
+
+export type Usuario = {
+  id: string;
+  nome: string;
+  email: string;
+  cpf?: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type RegistroInsert = {
+  estado: "PERDIDO" | "ENCONTRADO" | "ARQUIVADO";
+  imagem_url?: string;
+  especie: "CACHORRO" | "GATO" | "AVE" | "ROEDOR" | "REPTIL";
+  raca?: string;
+  tamanho: "PEQUENO" | "MEDIO" | "GRANDE";
+  cor_pelagem: string;
+  cor_olhos?: string;
+  observacoes?: string;
+  latitude: number;
+  longitude: number;
+  last_seen_at?: string;
+};
+
+export type Registro = RegistroInsert & {
+  id: string;
+  usuario_id: string;
+  data_registro: string;
+  arquivado_em?: string;
+  created_at: string;
+  updated_at: string;
+};
+
+/**
+ * Hash a password using SHA256
+ */
+async function hashPassword(password: string): Promise<string> {
+  return await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    password
+  );
+}
+
+/**
+ * Registra um novo usuário no banco de dados
+ */
+export async function registerUser(
+  nome: string,
+  email: string,
+  cpf: string,
+  senha: string
+): Promise<Usuario | null> {
+  try {
+    const senhaHash = await hashPassword(senha);
+
+    const { data, error } = await supabase
+      .from("usuarios")
+      .insert([
+        {
+          nome,
+          email: email.toLowerCase(),
+          cpf: cpf.replace(/\D/g, ""),
+          senha_hash: senhaHash,
+        },
+      ])
+      .select("id, nome, email, cpf, created_at, updated_at");
+
+    if (error) throw error;
+    return data?.[0] || null;
+  } catch (err) {
+    console.error("Erro ao registrar usuário:", err);
+    throw err;
+  }
+}
+
+/**
+ * Faz login com email e senha
+ */
+export async function loginUser(
+  email: string,
+  senha: string
+): Promise<Usuario | null> {
+  try {
+    const senhaHash = await hashPassword(senha);
+
+    const { data, error } = await supabase
+      .from("usuarios")
+      .select("id, nome, email, cpf, created_at, updated_at, senha_hash")
+      .eq("email", email.toLowerCase())
+      .single();
+
+    if (error || !data) {
+      throw new Error("Usuário não encontrado");
+    }
+
+    if (data.senha_hash !== senhaHash) {
+      throw new Error("Senha inválida");
+    }
+
+    const { senha_hash, ...usuario } = data;
+    return usuario;
+  } catch (err) {
+    console.error("Erro ao fazer login:", err);
+    throw err;
+  }
+}
+
+/**
+ * Busca um usuário pelo ID
+ */
+export async function getUserById(userId: string): Promise<Usuario | null> {
+  try {
+    const { data, error } = await supabase
+      .from("usuarios")
+      .select("id, nome, email, cpf, created_at, updated_at")
+      .eq("id", userId)
+      .single();
+
+    if (error) throw error;
+    return data || null;
+  } catch (err) {
+    console.error("Erro ao buscar usuário:", err);
+    throw err;
+  }
+}
+
+/**
+ * Cria um novo registro de pet
+ */
+export async function createRegistro(
+  usuarioId: string,
+  registroData: RegistroInsert
+): Promise<Registro | null> {
+  try {
+    const { data, error } = await supabase
+      .from("registros")
+      .insert([
+        {
+          usuario_id: usuarioId,
+          ...registroData,
+        },
+      ])
+      .select();
+
+    if (error) throw error;
+    return data?.[0] || null;
+  } catch (err) {
+    console.error("Erro ao criar registro:", err);
+    throw err;
+  }
+}
+
+/**
+ * Busca registros próximos por localização
+ */
+export async function getNearbyRecords(
+  latitude: number,
+  longitude: number,
+  radiusKm: number = 5
+): Promise<Registro[]> {
+  try {
+    const { data, error } = await supabase
+      .from("registros")
+      .select("*")
+      .in("estado", ["PERDIDO", "ENCONTRADO"])
+      .order("data_registro", { ascending: false });
+
+    if (error) throw error;
+
+    // Filtro simples por raio (em produção, usar PostGIS do Supabase)
+    return (data || []).filter((r) => {
+      const distance = calculateDistance(
+        latitude,
+        longitude,
+        r.latitude,
+        r.longitude
+      );
+      return distance <= radiusKm;
+    });
+  } catch (err) {
+    console.error("Erro ao buscar registros próximos:", err);
+    throw err;
+  }
+}
+
+/**
+ * Busca registros do usuário
+ */
+export async function getUserRecords(usuarioId: string): Promise<Registro[]> {
+  try {
+    const { data, error } = await supabase
+      .from("registros")
+      .select("*")
+      .eq("usuario_id", usuarioId)
+      .order("data_registro", { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  } catch (err) {
+    console.error("Erro ao buscar registros do usuário:", err);
+    throw err;
+  }
+}
+
+/**
+ * Busca um registro específico
+ */
+export async function getRegistroById(id: string): Promise<Registro | null> {
+  try {
+    const { data, error } = await supabase
+      .from("registros")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) throw error;
+    return data || null;
+  } catch (err) {
+    console.error("Erro ao buscar registro:", err);
+    throw err;
+  }
+}
+
+/**
+ * Atualiza um registro
+ */
+export async function updateRegistro(
+  id: string,
+  updates: Partial<RegistroInsert>
+): Promise<Registro | null> {
+  try {
+    const { data, error } = await supabase
+      .from("registros")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data || null;
+  } catch (err) {
+    console.error("Erro ao atualizar registro:", err);
+    throw err;
+  }
+}
+
+/**
+ * Arquiva um registro
+ */
+export async function archiveRegistro(id: string): Promise<Registro | null> {
+  try {
+    return await updateRegistro(id, {
+      estado: "ARQUIVADO",
+    });
+  } catch (err) {
+    console.error("Erro ao arquivar registro:", err);
+    throw err;
+  }
+}
+
+/**
+ * Calcula distância entre dois pontos (em km) usando Haversine
+ */
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 6371; // Raio da Terra em km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+/**
+ * Busca matches (encontros que correspondem com perdas do usuário)
+ */
+export async function getMatchesForUser(
+  usuarioId: string,
+  radiusKm: number = 10
+): Promise<Registro[]> {
+  try {
+    // Primeiro, busca as perdas do usuário
+    const userLosses = await getUserRecords(usuarioId);
+    const losses = userLosses.filter((r) => r.estado === "PERDIDO");
+
+    if (losses.length === 0) {
+      return [];
+    }
+
+    // Depois, busca registros de encontros próximos
+    const { data, error } = await supabase
+      .from("registros")
+      .select("*")
+      .eq("estado", "ENCONTRADO")
+      .neq("usuario_id", usuarioId)
+      .order("data_registro", { ascending: false });
+
+    if (error) throw error;
+
+    // Filtra por similaridade de características e proximidade
+    const matches = (data || []).filter((encontro) => {
+      // Conta coincidências de características (no mínimo 3)
+      let coincidencias = 0;
+
+      for (const loss of losses) {
+        if (loss.especie === encontro.especie) coincidencias++;
+        if (loss.tamanho === encontro.tamanho) coincidencias++;
+        if (
+          loss.cor_pelagem.toLowerCase() === encontro.cor_pelagem.toLowerCase()
+        )
+          coincidencias++;
+        if (loss.raca?.toLowerCase() === encontro.raca?.toLowerCase())
+          coincidencias++;
+
+        if (coincidencias >= 3) return true;
+      }
+
+      return false;
+    });
+
+    return matches;
+  } catch (err) {
+    console.error("Erro ao buscar matches:", err);
+    throw err;
+  }
+}
