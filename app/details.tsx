@@ -73,13 +73,14 @@ export default function DetailsScreen() {
     );
   }
 
-  const name = `Pet ${record.especie}`;
+  const name = record.especie;
   const lastSeen = record.observacoes || "Sem informações";
   const breed = record.raca || "Raça desconhecida";
   const color = record.cor_pelagem || "Cor desconhecida";
   const eyeColor = record.cor_olhos || "";
   const size = record.tamanho || "";
   const status = record.estado || "encontro";
+  const visto = record.last_seen_at || "Sem informações";
 
   const statusColor =
     status === "PERDIDO" ? colors.danger : colors.success;
@@ -125,17 +126,15 @@ export default function DetailsScreen() {
             </View>
           </View>
 
-          <View style={styles.tagsRow}>
+          {/* <View style={styles.tagsRow}>
             <View style={styles.tag}>
               <Text style={styles.tagText}>{record.especie}</Text>
             </View>
+
             <View style={styles.tag}>
-              <Text style={styles.tagText}>Macho</Text>
+              <Text style={styles.tagText}>Raça: {breed}</Text>
             </View>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>{breed}</Text>
-            </View>
-          </View>
+          </View> */}
 
           <View style={styles.section}>
             <View style={styles.locationRow}>
@@ -143,11 +142,11 @@ export default function DetailsScreen() {
                 <Text>📍</Text>
               </View>
               <View>
-                <Text style={styles.sectionLabel}>Último Visto</Text>
+                <Text style={styles.sectionLabel}>Visto por último</Text>
                 <Text style={styles.locationText}>
-                  {lastSeen.length > 30
-                    ? lastSeen.substring(0, 30) + "..."
-                    : lastSeen}
+                  {visto.length > 30
+                    ? visto.substring(0, 30) + "..."
+                    : visto}
                 </Text>
               </View>
             </View>

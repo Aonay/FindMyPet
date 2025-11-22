@@ -25,12 +25,13 @@ const statusIcons: Record<string, string> = {
 };
 
 export function HomeCard({ record }: Props) {
-  const name = `Pet ${record.especie}`;
+  const name = record.especie;
   const breed = record.raca || "Raça desconhecida";
   const color = record.cor_pelagem || "Cor desconhecida";
   const status = record.estado || "encontro";
   const statusColor = statusColors[status] || colors.primary;
   const statusIcon = statusIcons[status] || "❤️";
+
 
   return (
     <View style={styles.card}>

@@ -15,7 +15,7 @@ export type Usuario = {
 export type RegistroInsert = {
   estado: "PERDIDO" | "ENCONTRADO" | "ARQUIVADO";
   imagem_url?: string;
-  especie: "CACHORRO" | "GATO" | "AVE" | "ROEDOR" | "REPTIL";
+  especie: "CACHORRO" | "GATO";
   raca?: string;
   tamanho: "PEQUENO" | "MEDIO" | "GRANDE";
   cor_pelagem: string;

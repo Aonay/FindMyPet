@@ -87,8 +87,7 @@ export default function HomeScreen() {
               <Text style={styles.bigButtonIconText}>🐶</Text>
             </View>
             <View>
-              <Text style={styles.bigButtonTitle}>PERDI</Text>
-              <Text style={styles.bigButtonSubtitle}>MEU PET</Text>
+              <Text style={styles.bigButtonTitle}>Perdi meu pet</Text>
             </View>
           </TouchableOpacity>
 
@@ -101,8 +100,19 @@ export default function HomeScreen() {
               <Text style={styles.bigButtonIconText}>🔍</Text>
             </View>
             <View>
-              <Text style={styles.bigButtonTitle}>ENCONTREI</Text>
-              <Text style={styles.bigButtonSubtitle}>UM PET</Text>
+              <Text style={styles.bigButtonTitle}>Encontrei um pet</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.bigButton, { backgroundColor: colors.info }]}
+            onPress={() => router.push("/my-records")}
+            activeOpacity={0.9}
+          >
+            <View style={styles.bigButtonIcon}>
+              <Text style={styles.bigButtonIconText}>📝</Text>
+            </View>
+            <View>
+              <Text style={styles.bigButtonTitle}>Meus Registros</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -110,9 +120,6 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Feed de Animais Perdidos</Text>
-            <TouchableOpacity onPress={() => router.push("/my-records")}>
-              <Text style={styles.seeAll}>Ver todos</Text>
-            </TouchableOpacity>
           </View>
 
           {isLoading ? (
@@ -262,12 +269,7 @@ const styles = StyleSheet.create({
   },
   bigButtonTitle: {
     color: colors.white,
-    fontSize: typography.subtitle,
-    fontWeight: "bold",
-  },
-  bigButtonSubtitle: {
-    color: colors.white,
-    fontSize: typography.subtitle,
+    fontSize: typography.body,
     fontWeight: "bold",
   },
   section: {
