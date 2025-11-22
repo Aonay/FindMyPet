@@ -116,7 +116,7 @@ export default function DetailsScreen() {
             {record.observacoes || "Sem observacoes"}
           </Text>
         </View>
-        <MapPlaceholder />
+        <MapPlaceholder latitude={record.latitude} longitude={record.longitude} />
         <View style={styles.questionBox}>
           <Text
             style={styles.question}

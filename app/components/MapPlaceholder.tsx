@@ -6,11 +6,15 @@ import { colors, radii, spacing, typography } from "../constants/theme";
 type Props = {
   label?: string;
   onLocationChange?: (latitude: number, longitude: number) => void;
+  latitude?: number;
+  longitude?: number;
 };
 
 export function MapPlaceholder({
   label = "Mapa SDK",
   onLocationChange,
+  latitude,
+  longitude,
 }: Props) {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
@@ -19,8 +23,14 @@ export function MapPlaceholder({
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
 
+  // If coordinates are provided (saved from database), use them directly
+  // Otherwise, load current device location (for registration)
+  const shouldLoadCurrentLocation = latitude === undefined || longitude === undefined;
+
   useEffect(() => {
-    getCurrentLocation();
+    if (shouldLoadCurrentLocation) {
+      getCurrentLocation();
+    }
   }, []);
 
   const getCurrentLocation = async () => {
@@ -91,28 +101,30 @@ export function MapPlaceholder({
           </View>
           <Text style={styles.errorText}>{error}</Text>
         </>
-      ) : location ? (
+      ) : location || (latitude && longitude) ? (
         <>
           <View style={styles.mapBackground}>
             {!imageError ? (
-              <Image
-                source={{
-                  uri: getStaticMapUrl(
-                    location.coords.latitude,
-                    location.coords.longitude
-                  ),
-                }}
-                style={styles.mapImage}
-                resizeMode="cover"
-                onError={(e) => {
-                  console.error(
-                    "Error loading map image:",
-                    e.nativeEvent.error
-                  );
-                  setImageError(true);
-                }}
-                onLoad={() => console.log("Map image loaded successfully")}
-              />
+              <View style={styles.imageWrapper}>
+                <Image
+                  source={{
+                    uri: getStaticMapUrl(
+                      latitude ?? location?.coords.latitude ?? 0,
+                      longitude ?? location?.coords.longitude ?? 0
+                    ),
+                  }}
+                  style={styles.mapImage as any}
+                  resizeMode="cover"
+                  onError={(e) => {
+                    console.error(
+                      "Error loading map image:",
+                      e.nativeEvent.error
+                    );
+                    setImageError(true);
+                  }}
+                  onLoad={() => console.log("Map image loaded successfully")}
+                />
+              </View>
             ) : (
               <View style={styles.mapFallback}>
                 <Text style={styles.mapFallbackText}>🗺️</Text>
@@ -122,16 +134,6 @@ export function MapPlaceholder({
           {/* Center pin marker on the map */}
           <View style={styles.centerPin}>
             <Text style={styles.centerPinText}>📍</Text>
-          </View>
-          <View style={styles.overlay}>
-            <View style={styles.pinSmall}>
-              <Text style={styles.pinTextSmall}>📍</Text>
-            </View>
-            <Text style={styles.coordsOverlay}>
-              {`${location.coords.latitude.toFixed(
-                4
-              )}, ${location.coords.longitude.toFixed(4)}`}
-            </Text>
           </View>
         </>
       ) : (
@@ -162,9 +164,8 @@ const styles = StyleSheet.create({
   },
   mapImage: {
     width: "100%",
-    height: "150%",
-    objectFit: "fill",
-  },
+    height: "100%",
+  } as any,
   mapBackground: {
     width: "100%",
     height: "100%",
@@ -172,7 +173,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#e8f4f8",
     justifyContent: "center",
     alignItems: "center",
+    overflow: "hidden",
   },
+  imageWrapper: {
+    width: "100%",
+    height: "100%",
+    overflow: "hidden",
+  } as any,
   mapFallback: {
     width: "100%",
     height: "100%",
