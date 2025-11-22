@@ -1,9 +1,8 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { colors, radii, spacing, typography } from "../constants/theme";
-import { PetRecord } from "../data/mock";
 import { Registro } from "../services/database";
 
-type UnifiedRecord = (PetRecord | Registro) & {
+type UnifiedRecord = (Registro) & {
   estado?: string;
   status?: string;
 };
@@ -39,17 +38,20 @@ export function RecordCard({ record, compact }: Props) {
   return (
     <View style={[styles.card, compact && styles.compactCard]}>
       <View style={styles.icon}>
-        <Text style={styles.iconText}>❤</Text>
+        {(record as any).imagem_url ? (
+          <Image
+            source={{ uri: (record as any).imagem_url }}
+            style={styles.image}
+            resizeMode="cover"
+          />
+        ) : (
+          <Text style={styles.iconText}>{(record as any).especie === "GATO" ? "🐱" : "🐶"}</Text>
+        )}
       </View>
       <View style={styles.info}>
         <Text style={styles.title}>{name}</Text>
-        <Text style={styles.meta}>{`Ultimo: ${lastSeen}`}</Text>
-        <Text style={styles.meta}>{`Cor: ${color} | Raca: ${breed}`}</Text>
-        {!compact && eyeColor && (
-          <Text
-            style={styles.meta}
-          >{`Olhos: ${eyeColor} • Porte: ${size}`}</Text>
-        )}
+        <Text style={styles.meta}>{`Cor: ${color}`}</Text>
+        <Text style={styles.meta}>{`Raca: ${breed}`}</Text>
       </View>
       <View
         style={[
@@ -68,35 +70,48 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: spacing.md,
-    borderRadius: radii.md,
+    borderRadius: radii.lg,
     backgroundColor: colors.card,
     gap: spacing.md,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
     borderWidth: 1,
     borderColor: colors.border,
     width: "100%",
   },
   compactCard: {
-    width: 220,
+    width: 260,
   },
   icon: {
-    width: 48,
-    height: 48,
-    borderRadius: radii.lg,
-    backgroundColor: colors.info,
+    width: 56,
+    height: 56,
+    borderRadius: radii.md,
+    backgroundColor: colors.accent,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
   },
   iconText: {
-    fontSize: 24,
+    fontSize: 28,
   },
   info: {
     flex: 1,
+    gap: 2,
   },
   title: {
     fontSize: typography.subtitle,
-    fontWeight: "600",
+    fontWeight: "bold",
     color: colors.textDark,
-    marginBottom: spacing.xs,
   },
   meta: {
     fontSize: typography.caption,
@@ -104,12 +119,14 @@ const styles = StyleSheet.create({
   },
   badge: {
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingVertical: 4,
     borderRadius: radii.pill,
   },
   badgeText: {
-    color: colors.textDark,
-    fontWeight: "600",
-    textTransform: "capitalize",
+    color: colors.white,
+    fontSize: 10,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
 });

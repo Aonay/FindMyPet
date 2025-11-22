@@ -75,9 +75,9 @@ export function MapPlaceholder({
         Math.log(
           Math.tan((lat * Math.PI) / 180) + 1 / Math.cos((lat * Math.PI) / 180)
         ) /
-          Math.PI) /
+        Math.PI) /
         2) *
-        Math.pow(2, zoom)
+      Math.pow(2, zoom)
     );
 
     // Use tile.openstreetmap.org which is more reliable
@@ -151,16 +151,20 @@ export function MapPlaceholder({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    height: 180,
+    height: 200,
     borderRadius: radii.lg,
     backgroundColor: colors.accent,
-    borderWidth: 1,
-    borderColor: colors.warning,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.sm,
     overflow: "hidden",
     position: "relative",
+    borderWidth: 0,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
   },
   mapImage: {
     width: "100%",
@@ -170,26 +174,24 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     position: "absolute",
-    backgroundColor: "#e8f4f8",
+    backgroundColor: "#E5E7EB",
     justifyContent: "center",
     alignItems: "center",
-    overflow: "hidden",
   },
   imageWrapper: {
     width: "100%",
     height: "100%",
-    overflow: "hidden",
   } as any,
   mapFallback: {
     width: "100%",
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#d0e8f0",
+    backgroundColor: "#E5E7EB",
   },
   mapFallbackText: {
     fontSize: 48,
-    opacity: 0.5,
+    opacity: 0.3,
   },
   centerPin: {
     position: "absolute",
@@ -202,8 +204,8 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.5,
-    shadowRadius: 3,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
     elevation: 5,
   },
   centerPinText: {
@@ -242,19 +244,29 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: radii.lg,
-    backgroundColor: colors.warning,
+    backgroundColor: colors.white,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    marginBottom: spacing.sm,
   },
   pinText: {
     fontSize: 24,
   },
   label: {
-    fontSize: typography.caption,
+    fontSize: typography.body,
     color: colors.text,
+    fontWeight: "500",
   },
   coords: {
-    fontSize: typography.caption - 2,
+    fontSize: typography.caption,
     color: colors.text,
     opacity: 0.7,
   },

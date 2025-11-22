@@ -79,15 +79,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   container: {
-    padding: spacing.xl,
+    padding: spacing.lg,
     gap: spacing.md,
   },
   title: {
     textAlign: "center",
     fontSize: typography.title,
-    color: colors.primary,
-    fontWeight: "700",
-    marginBottom: spacing.lg,
+    color: colors.textDark,
+    fontWeight: "bold",
+    marginBottom: spacing.md,
   },
   list: {
     gap: spacing.md,
@@ -96,9 +96,10 @@ const styles = StyleSheet.create({
     marginVertical: spacing.xl,
   },
   emptyText: {
-    fontSize: typography.caption,
+    fontSize: typography.body,
     color: colors.text,
     textAlign: "center",
     marginVertical: spacing.lg,
+    fontStyle: "italic",
   },
 });

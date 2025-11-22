@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { colors, radii, spacing, typography } from "../constants/theme";
 import { Registro } from "../services/database";
 
@@ -33,9 +33,17 @@ export function HomeCard({ record }: Props) {
   const statusIcon = statusIcons[status] || "❤️";
 
   return (
-    <View style={[styles.card, { backgroundColor: statusColor }]}>
+    <View style={styles.card}>
       <View style={styles.iconContainer}>
-        <Text style={styles.icon}>{statusIcon}</Text>
+        {record.imagem_url ? (
+          <Image
+            source={{ uri: record.imagem_url }}
+            style={styles.image}
+            resizeMode="cover"
+          />
+        ) : (
+          <Text style={styles.icon}>{statusIcon}</Text>
+        )}
       </View>
       <View style={styles.info}>
         <Text style={styles.title} numberOfLines={1}>
@@ -45,10 +53,10 @@ export function HomeCard({ record }: Props) {
           {breed}
         </Text>
         <Text style={styles.detail} numberOfLines={1}>
-          {color}
+          Dist: 2km
         </Text>
       </View>
-      <View style={styles.badge}>
+      <View style={[styles.badge, { backgroundColor: statusColor }]}>
         <Text style={styles.badgeText}>{status?.toUpperCase()}</Text>
       </View>
     </View>
@@ -57,55 +65,61 @@ export function HomeCard({ record }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    width: 160,
-    height: 160,
+    width: 180,
+    height: 240,
     borderRadius: radii.lg,
-    padding: spacing.md,
-    justifyContent: "space-between",
+    backgroundColor: colors.card,
+    overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: 12,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   iconContainer: {
-    alignSelf: "center",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    width: "100%",
+    height: 140,
+    backgroundColor: colors.accent,
     alignItems: "center",
     justifyContent: "center",
   },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
   icon: {
-    fontSize: 32,
+    fontSize: 48,
   },
   info: {
-    gap: spacing.xs,
+    padding: spacing.md,
+    gap: 2,
   },
   title: {
-    fontSize: typography.body,
-    fontWeight: "700",
+    fontSize: typography.subtitle,
+    fontWeight: "bold",
     color: colors.textDark,
   },
   detail: {
     fontSize: typography.caption,
-    color: colors.textDark,
-    opacity: 0.9,
+    color: colors.text,
   },
   badge: {
-    alignSelf: "flex-start",
+    position: "absolute",
+    top: spacing.sm,
+    right: spacing.sm,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
+    paddingVertical: 4,
     borderRadius: radii.pill,
-    backgroundColor: "rgba(255, 255, 255, 0.4)",
   },
   badgeText: {
     fontSize: 10,
     fontWeight: "700",
-    color: colors.textDark,
+    color: colors.white,
+    letterSpacing: 0.5,
   },
 });

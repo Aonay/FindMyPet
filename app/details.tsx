@@ -14,7 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MapPlaceholder } from "./components/MapPlaceholder";
 import { PrimaryButton } from "./components/PrimaryButton";
-import { colors, spacing, typography } from "./constants/theme";
+import { colors, radii, spacing, typography } from "./constants/theme";
 import { getRegistroById, Registro, updateRegistro } from "./services/database";
 
 export default function DetailsScreen() {
@@ -81,57 +81,118 @@ export default function DetailsScreen() {
   const size = record.tamanho || "";
   const status = record.estado || "encontro";
 
+  const statusColor =
+    status === "PERDIDO" ? colors.danger : colors.success;
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Detalhes</Text>
-
-        {record.imagem_url && (
+        <View style={styles.header}>
           <TouchableOpacity
-            style={styles.imageCard}
-            onPress={() => setShowFullImage(true)}
-            activeOpacity={0.8}
+            onPress={() => router.back()}
+            style={styles.backButton}
           >
-            <Image
-              source={{ uri: record.imagem_url }}
-              style={styles.image}
-              resizeMode="cover"
-            />
-            <View style={styles.imageOverlay}>
-              <Text style={styles.imageHint}>Toque para ampliar</Text>
-            </View>
+            <Text style={styles.backButtonText}>←</Text>
           </TouchableOpacity>
-        )}
-
-        <View style={styles.card}>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.meta}>{`Ultimo encontro: ${lastSeen}`}</Text>
-          <Text style={styles.meta}>{`Especie: ${record.especie}`}</Text>
-          <Text style={styles.meta}>{`Raca: ${breed}`}</Text>
-          <Text
-            style={styles.meta}
-          >{`Cor: ${color} | Olhos: ${eyeColor}`}</Text>
-          <Text style={styles.meta}>{`Porte: ${size}`}</Text>
-          <Text style={styles.meta}>
-            {record.observacoes || "Sem observacoes"}
-          </Text>
         </View>
-        <MapPlaceholder latitude={record.latitude} longitude={record.longitude} />
-        <View style={styles.questionBox}>
-          <Text
-            style={styles.question}
-          >{`Animal ainda ${status?.toLowerCase()}?`}</Text>
+
+        <View style={styles.imageContainer}>
+          {record.imagem_url ? (
+            <TouchableOpacity
+              onPress={() => setShowFullImage(true)}
+              activeOpacity={0.9}
+            >
+              <Image
+                source={{ uri: record.imagem_url }}
+                style={styles.mainImage}
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+          ) : (
+            <View style={[styles.mainImage, styles.imagePlaceholder]}>
+              <Text style={styles.placeholderIcon}>
+                {record.especie === "GATO" ? "🐱" : "🐶"}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.contentCard}>
+          <View style={styles.titleRow}>
+            <Text style={styles.name}>{name}</Text>
+            <View style={[styles.badge, { backgroundColor: statusColor }]}>
+              <Text style={styles.badgeText}>{status}</Text>
+            </View>
+          </View>
+
+          <View style={styles.tagsRow}>
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>{record.especie}</Text>
+            </View>
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>Macho</Text>
+            </View>
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>{breed}</Text>
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <View style={styles.locationRow}>
+              <View style={styles.locationIcon}>
+                <Text>📍</Text>
+              </View>
+              <View>
+                <Text style={styles.sectionLabel}>Último Visto</Text>
+                <Text style={styles.locationText}>
+                  {lastSeen.length > 30
+                    ? lastSeen.substring(0, 30) + "..."
+                    : lastSeen}
+                </Text>
+              </View>
+            </View>
+            <MapPlaceholder
+              latitude={record.latitude}
+              longitude={record.longitude}
+            />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>Detalhes</Text>
+            <Text style={styles.description}>
+              {record.observacoes || "Sem observações adicionais."}
+            </Text>
+            <Text style={styles.metaText}>
+              Cor: {color} • Olhos: {eyeColor} • Porte: {size}
+            </Text>
+          </View>
+
           <View style={styles.actions}>
             <PrimaryButton
-              label={isUpdating ? "Atualizando..." : "Arquivar"}
-              onPress={handleArchive}
-              variant="secondary"
+              label="Contatar Dono"
+              onPress={() => Alert.alert("Contato", "Funcionalidade em breve")}
+              leftIcon={<Text style={{ color: "#fff", fontSize: 18 }}>📞</Text>}
             />
             <PrimaryButton
-              label="Voltar"
-              onPress={() => router.back()}
-              variant="outline"
+              label="Enviar Mensagem"
+              variant="secondary"
+              onPress={() => Alert.alert("Mensagem", "Funcionalidade em breve")}
+              leftIcon={<Text style={{ color: "#fff", fontSize: 18 }}>💬</Text>}
+              style={{ backgroundColor: "#E5E7EB" }}
             />
+            {/* Hack to override secondary style for the grey button look */}
+          </View>
+
+          <View style={styles.ownerActions}>
+            <Text style={styles.ownerTitle}>Gerenciar Registro</Text>
+            <View style={styles.ownerButtons}>
+              <PrimaryButton
+                label={isUpdating ? "Atualizando..." : "Arquivar Caso"}
+                onPress={handleArchive}
+                variant="outline"
+                style={{ borderColor: colors.warning }}
+              />
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -169,79 +230,154 @@ export default function DetailsScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: "#F3F4F6", // Light gray background behind image
   },
   container: {
-    padding: spacing.xl,
-    gap: spacing.lg,
+    paddingBottom: spacing.xl,
   },
-  title: {
-    textAlign: "center",
-    fontSize: typography.title,
-    color: colors.primary,
-    fontWeight: "700",
+  header: {
+    position: "absolute",
+    top: spacing.lg,
+    left: spacing.lg,
+    zIndex: 10,
   },
-  card: {
-    padding: spacing.lg,
-    borderRadius: spacing.lg,
-    backgroundColor: colors.info,
-    gap: spacing.xs,
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.8)",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  name: {
-    fontSize: typography.subtitle,
-    fontWeight: "700",
+  backButtonText: {
+    fontSize: 24,
+    fontWeight: "bold",
     color: colors.textDark,
+    marginTop: -2,
   },
-  meta: {
-    color: colors.text,
-    fontSize: typography.caption,
-  },
-  errorText: {
-    color: colors.danger,
-    fontSize: typography.body,
-    textAlign: "center",
-  },
-  questionBox: {
-    padding: spacing.lg,
-    borderRadius: spacing.lg,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: spacing.md,
-  },
-  question: {
-    fontSize: typography.subtitle,
-    color: colors.textDark,
-  },
-  actions: {
-    flexDirection: "row",
-    gap: spacing.md,
-  },
-  imageCard: {
-    borderRadius: spacing.lg,
-    backgroundColor: colors.card,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: colors.border,
-    position: "relative",
-  },
-  image: {
+  imageContainer: {
     width: "100%",
-    height: 250,
+    height: 350,
+    backgroundColor: "#E5E7EB",
+  },
+  mainImage: {
+    width: "100%",
+    height: "100%",
+  },
+  imagePlaceholder: {
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: colors.accent,
   },
-  imageOverlay: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    padding: spacing.sm,
+  placeholderIcon: {
+    fontSize: 80,
+  },
+  contentCard: {
+    marginTop: -40,
+    marginHorizontal: spacing.md,
+    backgroundColor: colors.card,
+    borderRadius: radii.lg,
+    padding: spacing.lg,
+    gap: spacing.lg,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
   },
-  imageHint: {
+  name: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: colors.textDark,
+  },
+  badge: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.pill,
+  },
+  badgeText: {
     color: "#fff",
+    fontWeight: "bold",
+    fontSize: 12,
+  },
+  tagsRow: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  tag: {
+    backgroundColor: "#F3F4F6",
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.pill,
+  },
+  tagText: {
+    color: colors.textDark,
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  section: {
+    gap: spacing.sm,
+  },
+  locationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    marginBottom: spacing.xs,
+  },
+  locationIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#FEF2F2", // Light red
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionLabel: {
+    fontSize: typography.subtitle,
+    fontWeight: "bold",
+    color: colors.textDark,
+  },
+  locationText: {
+    fontSize: typography.body,
+    color: colors.text,
+  },
+  description: {
+    fontSize: typography.body,
+    color: colors.text,
+    lineHeight: 24,
+  },
+  metaText: {
     fontSize: typography.caption,
+    color: colors.text,
+    marginTop: spacing.xs,
+  },
+  actions: {
+    gap: spacing.md,
+    marginTop: spacing.sm,
+  },
+  ownerActions: {
+    marginTop: spacing.lg,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    gap: spacing.md,
+  },
+  ownerTitle: {
+    fontSize: typography.subtitle,
+    fontWeight: "600",
+    color: colors.textDark,
+  },
+  ownerButtons: {
+    flexDirection: "row",
+    gap: spacing.md,
   },
   modalContainer: {
     flex: 1,
@@ -271,5 +407,10 @@ const styles = StyleSheet.create({
   fullImage: {
     width: "100%",
     height: "100%",
+  },
+  errorText: {
+    color: colors.danger,
+    fontSize: typography.body,
+    textAlign: "center",
   },
 });

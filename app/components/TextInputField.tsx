@@ -32,18 +32,20 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: typography.caption,
-    color: colors.text,
+    color: colors.textDark,
+    fontWeight: "600",
     marginBottom: spacing.xs,
+    marginLeft: spacing.xs,
   },
   input: {
     width: "100%",
-    borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: radii.md,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.card,
+    paddingVertical: spacing.md,
+    backgroundColor: "#F3F4F6", // Light gray
     fontSize: typography.body,
     color: colors.textDark,
+    borderWidth: 1,
+    borderColor: "transparent",
   },
 });

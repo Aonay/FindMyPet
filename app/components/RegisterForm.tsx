@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { colors, spacing, typography } from "../constants/theme";
+import { colors, radii, spacing, typography } from "../constants/theme";
 import { RegistroInsert } from "../services/database";
 import { supabase } from "../services/supabaseClient";
 import { MapPlaceholder } from "./MapPlaceholder";
@@ -149,73 +149,99 @@ export function RegisterForm({ title, onSubmit }: Props) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>{title}</Text>
+
       <TouchableOpacity
         style={styles.imagePicker}
         onPress={handleTakePhoto}
         disabled={isUploading}
+        activeOpacity={0.8}
       >
         {imageUri ? (
           <Image source={{ uri: imageUri }} style={styles.imagePreview} />
         ) : (
-          <Text style={styles.imageText}>
-            {isUploading ? "Enviando..." : "Adicionar Imagem"}
-          </Text>
+          <View style={styles.imagePlaceholder}>
+            <Text style={styles.imageIcon}>📷</Text>
+            <Text style={styles.imageText}>
+              {isUploading ? "Enviando..." : "Adicionar Foto"}
+            </Text>
+          </View>
         )}
       </TouchableOpacity>
-      <View style={styles.row}>
-        <View style={styles.flex}>
-          <TextInputField
-            placeholder="Especie"
-            value={formData.especie || ""}
-            onChangeText={(val) =>
-              setFormData({ ...formData, especie: val as any })
-            }
-          />
+
+      <View style={styles.formSection}>
+        <View style={styles.row}>
+          <View style={styles.flex}>
+            <TextInputField
+              label="Espécie"
+              placeholder="Ex: Cachorro"
+              value={formData.especie || ""}
+              onChangeText={(val) =>
+                setFormData({ ...formData, especie: val as any })
+              }
+            />
+          </View>
+          <View style={styles.flex}>
+            <TextInputField
+              label="Raça"
+              placeholder="Ex: Golden"
+              value={formData.raca || ""}
+              onChangeText={(val) => setFormData({ ...formData, raca: val })}
+            />
+          </View>
         </View>
-        <View style={styles.flex}>
-          <TextInputField
-            placeholder="Raca"
-            value={formData.raca || ""}
-            onChangeText={(val) => setFormData({ ...formData, raca: val })}
-          />
+
+        <View style={styles.row}>
+          <View style={styles.flex}>
+            <TextInputField
+              label="Tamanho"
+              placeholder="Pequeno/Médio/Grande"
+              value={formData.tamanho || ""}
+              onChangeText={(val) =>
+                setFormData({ ...formData, tamanho: val as any })
+              }
+            />
+          </View>
+          <View style={styles.flex}>
+            <TextInputField
+              label="Cor da Pelagem"
+              placeholder="Ex: Dourado"
+              value={formData.cor_pelagem || ""}
+              onChangeText={(val) =>
+                setFormData({ ...formData, cor_pelagem: val })
+              }
+            />
+          </View>
         </View>
+
+        <TextInputField
+          label="Cor dos Olhos"
+          placeholder="Ex: Castanhos"
+          value={formData.cor_olhos || ""}
+          onChangeText={(val) => setFormData({ ...formData, cor_olhos: val })}
+        />
+
+        <TextInputField
+          label="Observações"
+          placeholder="Detalhes adicionais sobre o pet ou local..."
+          multiline
+          numberOfLines={4}
+          textAlignVertical="top"
+          value={formData.observacoes || ""}
+          onChangeText={(val) => setFormData({ ...formData, observacoes: val })}
+          style={{ height: 100 }}
+        />
       </View>
-      <View style={styles.row}>
-        <View style={styles.flex}>
-          <TextInputField
-            placeholder="Tamanho"
-            value={formData.tamanho || ""}
-            onChangeText={(val) =>
-              setFormData({ ...formData, tamanho: val as any })
-            }
-          />
-        </View>
-        <View style={styles.flex}>
-          <TextInputField
-            placeholder="Cor da Pelagem"
-            value={formData.cor_pelagem || ""}
-            onChangeText={(val) =>
-              setFormData({ ...formData, cor_pelagem: val })
-            }
-          />
-        </View>
+
+      <View style={styles.mapSection}>
+        <Text style={styles.sectionTitle}>Localização</Text>
+        <MapPlaceholder onLocationChange={handleLocationChange} />
+        <Text style={styles.hint}>
+          A localização atual será usada para o registro.
+        </Text>
       </View>
-      <TextInputField
-        placeholder="Cor dos Olhos"
-        value={formData.cor_olhos || ""}
-        onChangeText={(val) => setFormData({ ...formData, cor_olhos: val })}
-      />
-      <TextInputField
-        placeholder="Observacoes"
-        multiline
-        numberOfLines={3}
-        textAlignVertical="top"
-        value={formData.observacoes || ""}
-        onChangeText={(val) => setFormData({ ...formData, observacoes: val })}
-      />
-      <MapPlaceholder onLocationChange={handleLocationChange} />
+
       <PrimaryButton
-        label="Salvar"
+        label="Salvar Registro"
         onPress={handleSubmit}
         style={styles.submit}
       />
@@ -225,35 +251,47 @@ export function RegisterForm({ title, onSubmit }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: spacing.xl,
-    gap: spacing.md,
+    padding: spacing.lg,
+    gap: spacing.xl,
+    paddingBottom: spacing.xl * 2,
   },
   title: {
     textAlign: "center",
     fontSize: typography.title,
-    color: colors.primary,
-    fontWeight: "700",
-    marginBottom: spacing.md,
+    color: colors.textDark,
+    fontWeight: "bold",
   },
   imagePicker: {
-    borderWidth: 1,
-    borderColor: colors.warning,
-    borderRadius: spacing.md,
-    padding: spacing.md,
+    width: "100%",
+    height: 240,
+    borderRadius: radii.lg,
     backgroundColor: colors.accent,
-    minHeight: 200,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderStyle: "dashed",
     justifyContent: "center",
     alignItems: "center",
-    overflow: "hidden",
+  },
+  imagePlaceholder: {
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  imageIcon: {
+    fontSize: 48,
+    opacity: 0.5,
   },
   imageText: {
-    textAlign: "center",
+    fontSize: typography.body,
     color: colors.text,
+    fontWeight: "600",
   },
   imagePreview: {
     width: "100%",
-    height: 200,
-    borderRadius: spacing.md,
+    height: "100%",
+  },
+  formSection: {
+    gap: spacing.md,
   },
   row: {
     flexDirection: "row",
@@ -262,7 +300,20 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
+  mapSection: {
+    gap: spacing.sm,
+  },
+  sectionTitle: {
+    fontSize: typography.subtitle,
+    fontWeight: "600",
+    color: colors.textDark,
+  },
+  hint: {
+    fontSize: typography.caption,
+    color: colors.text,
+    textAlign: "center",
+  },
   submit: {
-    marginTop: spacing.lg,
+    marginTop: spacing.md,
   },
 });
