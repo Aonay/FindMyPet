@@ -1,4 +1,6 @@
 import * as Crypto from "expo-crypto";
+import * as Calendar from "expo-calendar";
+import * as Location from "expo-location";
 import { supabase } from "./supabaseClient";
 
 export type Usuario = {
@@ -145,10 +147,89 @@ export async function createRegistro(
       .select();
 
     if (error) throw error;
-    return data?.[0] || null;
+    const created = data?.[0] || null;
+
+    // Try to create a calendar event reminder 15 days after creation
+    if (created) {
+      // fire-and-forget; errors are logged inside helper
+      createCalendarEventForRegistro(created).catch((err) =>
+        console.error("Erro ao criar lembrete no calendário:", err)
+      );
+    }
+
+    return created;
   } catch (err) {
     console.error("Erro ao criar registro:", err);
     throw err;
+  }
+}
+
+async function createCalendarEventForRegistro(registro: Registro) {
+  try {
+    const { status } = await Calendar.requestCalendarPermissionsAsync();
+    if (status !== "granted") {
+      console.warn("Permissão de calendário não concedida");
+      return;
+    }
+
+    const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+    if (!calendars || calendars.length === 0) {
+      console.warn("Nenhum calendário disponível para criar evento");
+      return;
+    }
+
+    const writableCalendar = calendars.find((c) => (c as any).allowsModifications) || calendars[0];
+    const calendarId = (writableCalendar as any).id;
+
+    const createdAt = registro.created_at ? new Date(registro.created_at) : new Date();
+
+    // Make the event an all-day event on the date 15 days after creation
+    const eventStart = new Date(createdAt);
+    eventStart.setDate(eventStart.getDate() + 15);
+    eventStart.setHours(0, 0, 0, 0);
+    const eventEnd = new Date(eventStart);
+    eventEnd.setDate(eventEnd.getDate() + 1);
+
+    const title =
+      registro.estado === "ENCONTRADO"
+        ? `Revisitar Local do Pet ${registro.especie} ${registro.cor_pelagem}`
+        : `Confirmar Perda Pet ${registro.especie} ${registro.cor_pelagem}`;
+
+    // Try to reverse-geocode latitude/longitude into a human readable address
+    let locationText = `${registro.latitude},${registro.longitude}`;
+    try {
+      const locPerm = await Location.requestForegroundPermissionsAsync();
+      if (locPerm.status === "granted") {
+        const geocoded = await Location.reverseGeocodeAsync({
+          latitude: registro.latitude,
+          longitude: registro.longitude,
+        });
+        if (geocoded && geocoded.length > 0) {
+          const addr = geocoded[0];
+          const parts = [addr.name, addr.street, addr.city, addr.region, addr.postalCode, addr.country].filter(Boolean);
+          if (parts.length > 0) locationText = parts.join(", ");
+        }
+      }
+    } catch (err) {
+      console.warn("Não foi possível obter endereço via reverse geocode:", err);
+    }
+
+    const description =
+      registro.estado === "ENCONTRADO"
+        ? "Revisitar o local em que encontrou o pet e confirmar no aplicativo se ele ainda está lá"
+        : "Confirmar se no aplicativo se o pet ainda esta Perdido";
+
+    await Calendar.createEventAsync(calendarId, {
+      title,
+      startDate: eventStart,
+      endDate: eventEnd,
+      allDay: true,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      location: locationText,
+      notes: `${description}\nRegistro ID: ${registro.id}`,
+    });
+  } catch (err) {
+    console.error("Erro criando evento de calendário:", err);
   }
 }
 
