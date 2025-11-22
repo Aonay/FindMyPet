@@ -14,6 +14,7 @@ import { colors, radii, spacing, typography } from "../constants/theme";
 import { RegistroInsert } from "../services/database";
 import { supabase } from "../services/supabaseClient";
 import { MapPlaceholder } from "./MapPlaceholder";
+import { DropdownField, Option } from "./DropdownField";
 import { PrimaryButton } from "./PrimaryButton";
 import { TextInputField } from "./TextInputField";
 
@@ -21,6 +22,47 @@ type Props = {
   title: string;
   onSubmit: (data: RegistroInsert) => void;
 };
+
+const ESPECIE_OPTIONS: Option[] = [
+  { label: "Cachorro", value: "CACHORRO" },
+  { label: "Gato", value: "GATO" },
+];
+
+const RACA_OPTIONS: Option[] = [
+  { label: "SDR (Vira-lata)", value: "SDR" },
+  { label: "Border Collie", value: "Border Collie" },
+  { label: "Bulldog Francês", value: "Bulldog Francês" },
+  { label: "Dachshund", value: "Dachshund" },
+  { label: "Golden Retriever", value: "Golden Retriever" },
+  { label: "Labrador Retriever", value: "Labrador Retriever" },
+  { label: "Pastor Alemão", value: "Pastor Alemão" },
+  { label: "Poodle", value: "Poodle" },
+  { label: "Shih Tzu", value: "Shih Tzu" },
+  { label: "Spitz Alemão", value: "Spitz Alemão" },
+  { label: "Yorkshire", value: "Yorkshire" },
+];
+
+const TAMANHO_OPTIONS: Option[] = [
+  { label: "Pequeno", value: "PEQUENO" },
+  { label: "Médio", value: "MEDIO" },
+  { label: "Grande", value: "GRANDE" },
+];
+
+const COR_PELAGEM_OPTIONS: Option[] = [
+  { label: "Branco", value: "Branco" },
+  { label: "Caramelo", value: "Caramelo" },
+  { label: "Cinza", value: "Cinza" },
+  { label: "Preto", value: "Preto" },
+  { label: "Marrom", value: "Marrom" },
+  { label: "Malhado", value: "Malhado" },
+];
+
+const COR_OLHOS_OPTIONS: Option[] = [
+  { label: "Azul", value: "Azul" },
+  { label: "Castanho", value: "Castanho" },
+  { label: "Preto", value: "Preto" },
+  { label: "Verde", value: "Verde" },
+];
 
 export function RegisterForm({ title, onSubmit }: Props) {
   const [formData, setFormData] = React.useState<Partial<RegistroInsert>>({
@@ -171,53 +213,54 @@ export function RegisterForm({ title, onSubmit }: Props) {
       <View style={styles.formSection}>
         <View style={styles.row}>
           <View style={styles.flex}>
-            <TextInputField
+            <DropdownField
               label="Espécie"
-              placeholder="Ex: Cachorro"
               value={formData.especie || ""}
-              onChangeText={(val) =>
+              options={ESPECIE_OPTIONS}
+              onSelect={(val) =>
                 setFormData({ ...formData, especie: val as any })
               }
             />
           </View>
           <View style={styles.flex}>
-            <TextInputField
+            <DropdownField
               label="Raça"
-              placeholder="Ex: Golden"
               value={formData.raca || ""}
-              onChangeText={(val) => setFormData({ ...formData, raca: val })}
+              options={RACA_OPTIONS}
+              onSelect={(val) => setFormData({ ...formData, raca: val })}
+              placeholder="Selecione a raça"
             />
           </View>
         </View>
 
         <View style={styles.row}>
           <View style={styles.flex}>
-            <TextInputField
+            <DropdownField
               label="Tamanho"
-              placeholder="Pequeno/Médio/Grande"
               value={formData.tamanho || ""}
-              onChangeText={(val) =>
+              options={TAMANHO_OPTIONS}
+              onSelect={(val) =>
                 setFormData({ ...formData, tamanho: val as any })
               }
             />
           </View>
           <View style={styles.flex}>
-            <TextInputField
+            <DropdownField
               label="Cor da Pelagem"
-              placeholder="Ex: Dourado"
               value={formData.cor_pelagem || ""}
-              onChangeText={(val) =>
+              options={COR_PELAGEM_OPTIONS}
+              onSelect={(val) =>
                 setFormData({ ...formData, cor_pelagem: val })
               }
             />
           </View>
         </View>
 
-        <TextInputField
+        <DropdownField
           label="Cor dos Olhos"
-          placeholder="Ex: Castanhos"
           value={formData.cor_olhos || ""}
-          onChangeText={(val) => setFormData({ ...formData, cor_olhos: val })}
+          options={COR_OLHOS_OPTIONS}
+          onSelect={(val) => setFormData({ ...formData, cor_olhos: val })}
         />
 
         <TextInputField
