@@ -119,7 +119,24 @@ export default function DetailsScreen() {
   const eyeColor = record.cor_olhos || "";
   const size = record.tamanho || "";
   const status = record.estado || "encontro";
-  const visto = record.last_seen_at || "Sem informações";
+
+  // Compute visto text from created_at: "Hoje" or "há X dia(s)"
+  let visto = "Sem informações";
+  if (record && record.created_at) {
+    const createdDate = new Date(record.created_at);
+    if (!isNaN(createdDate.getTime())) {
+      const now = new Date();
+      const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const days = Math.floor((startOfDay(now).getTime() - startOfDay(createdDate).getTime()) / (24 * 60 * 60 * 1000));
+      if (days === 0) {
+        visto = "Hoje";
+      } else if (days === 1) {
+        visto = `há 1 dia`;
+      } else {
+        visto = `há ${days} dias`;
+      }
+    }
+  }
 
   const statusColor =
     status === "PERDIDO" ? colors.danger : colors.success;
@@ -178,15 +195,11 @@ export default function DetailsScreen() {
           <View style={styles.section}>
             <View style={styles.locationRow}>
               <View style={styles.locationIcon}>
-                <Text>📍</Text>
+                <MaterialIcons name="visibility" size={20} color={colors.info} />
               </View>
-              <View>
-                <Text style={styles.sectionLabel}>Visto por último</Text>
-                <Text style={styles.locationText}>
-                  {visto.length > 30
-                    ? visto.substring(0, 30) + "..."
-                    : visto}
-                </Text>
+              <View style={styles.locationContent}>
+                <Text style={styles.sectionLabel}>Visto por último:</Text>
+                <Text style={styles.vistoText}>{visto}</Text>
               </View>
             </View>
             <MapPlaceholder
@@ -395,6 +408,9 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     marginBottom: spacing.xs,
   },
+  locationContent: {
+    justifyContent: "center",
+  },
   locationIcon: {
     width: 40,
     height: 40,
@@ -475,6 +491,12 @@ const styles = StyleSheet.create({
     color: colors.danger,
     fontSize: typography.body,
     textAlign: "center",
+  },
+  vistoText: {
+    fontSize: typography.body,
+    color: colors.info,
+    textAlign: "center",
+    fontWeight: "800",
   },
   addressRow: {
     flexDirection: "row",
