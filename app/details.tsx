@@ -1,5 +1,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { Platform, Linking } from "react-native";
+import * as Location from "expo-location";
 import {
   ActivityIndicator,
   Alert,
@@ -16,6 +18,7 @@ import { MapPlaceholder } from "./components/MapPlaceholder";
 import { PrimaryButton } from "./components/PrimaryButton";
 import { colors, radii, spacing, typography } from "./constants/theme";
 import { getRegistroById, Registro, updateRegistro } from "./services/database";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function DetailsScreen() {
   const router = useRouter();
@@ -24,6 +27,8 @@ export default function DetailsScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [showFullImage, setShowFullImage] = useState(false);
+  const [address, setAddress] = useState<string | null>(null);
+  const [isAddressLoading, setIsAddressLoading] = useState(false);
 
   useEffect(() => {
     loadRecord();
@@ -42,6 +47,40 @@ export default function DetailsScreen() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    // after record is loaded, try to resolve an address for its coordinates
+    const resolveAddress = async () => {
+      if (!record) return;
+      if (typeof record.latitude !== "number" || typeof record.longitude !== "number") return;
+      setIsAddressLoading(true);
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setAddress(`${record.latitude}, ${record.longitude}`);
+          return;
+        }
+        const geocoded = await Location.reverseGeocodeAsync({
+          latitude: record.latitude,
+          longitude: record.longitude,
+        });
+        if (geocoded && geocoded.length > 0) {
+          const addr = geocoded[0];
+          const parts = [addr.name, addr.street, addr.city, addr.region, addr.postalCode, addr.country].filter(Boolean);
+          setAddress(parts.join(", ") || `${record.latitude}, ${record.longitude}`);
+        } else {
+          setAddress(`${record.latitude}, ${record.longitude}`);
+        }
+      } catch (err) {
+        console.warn("Erro ao obter endereco:", err);
+        setAddress(`${record.latitude}, ${record.longitude}`);
+      } finally {
+        setIsAddressLoading(false);
+      }
+    };
+
+    resolveAddress();
+  }, [record]);
 
   const handleArchive = async () => {
     if (!record?.id) return;
@@ -154,6 +193,31 @@ export default function DetailsScreen() {
               latitude={record.latitude}
               longitude={record.longitude}
             />
+            <View style={{ marginTop: spacing.sm }}>
+              {isAddressLoading ? (
+                <ActivityIndicator color={colors.primary} />
+              ) : address ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    // open maps with query; prefer google maps query with coordinates
+                    const query = encodeURIComponent(address);
+                    const lat = record.latitude;
+                    const lon = record.longitude;
+                    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+                    Linking.openURL(url).catch((err) =>
+                      Alert.alert("Erro", "Nao foi possivel abrir o mapa")
+                    );
+                  }}
+                >
+                  <View style={styles.addressRow}>
+                    <MaterialIcons name="place" size={18} color={colors.info} style={styles.addressIcon} />
+                    <Text style={[styles.locationText, styles.addressText, { textDecorationLine: "underline", color: colors.info }]}> 
+                      {address}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ) : null}
+            </View>
           </View>
 
           <View style={styles.section}>
@@ -411,5 +475,16 @@ const styles = StyleSheet.create({
     color: colors.danger,
     fontSize: typography.body,
     textAlign: "center",
+  },
+  addressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  addressIcon: {
+    fontSize: 18,
+    marginRight: spacing.sm,
+  },
+  addressText: {
+    flex: 1,
   },
 });
