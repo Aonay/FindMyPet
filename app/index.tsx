@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -56,7 +57,13 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        <Text style={styles.title}>LOGIN</Text>
+        <View style={styles.header}>
+          <Image
+            source={require("../assets/logo2.png")}
+            style={styles.logo}
+          />
+          <Text style={styles.title}>LOGIN</Text>
+        </View>
         <TextInputField
           placeholder="Email"
           autoCapitalize="none"
@@ -106,6 +113,17 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: "700",
     marginBottom: spacing.lg,
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: spacing.sm,
+  },
+  logo: {
+    width: 140,
+    height: 140,
+    resizeMode: "contain",
+    marginBottom: spacing.sm,
+    borderRadius: 20,
   },
   linkMuted: {
     fontSize: typography.caption,
