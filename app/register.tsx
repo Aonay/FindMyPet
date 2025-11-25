@@ -3,9 +3,11 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PrimaryButton } from "./components/PrimaryButton";
@@ -51,7 +53,13 @@ export default function RegisterScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>CADASTRO</Text>
+        <View style={styles.header}>
+          <Image
+            source={require("../assets/logo2.png")}
+            style={styles.logo}
+          />
+          <Text style={styles.title}>CADASTRO</Text>
+        </View>
         <TextInputField
           placeholder="Nome"
           value={nome}
@@ -116,6 +124,17 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.info,
     marginBottom: spacing.lg,
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: spacing.sm,
+  },
+  logo: {
+    width: 140,
+    height: 140,
+    resizeMode: "contain",
+    marginBottom: spacing.sm,
+    borderRadius: 20,
   },
   submit: {
     marginTop: spacing.lg,
