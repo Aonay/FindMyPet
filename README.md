@@ -2,6 +2,24 @@
 
 **Descrição curta:** Aplicativo mobile em React Native (Expo) para ajudar a encontrar pets perdidos: permite registrar avistamentos com foto,registar pet perdido com foto, localização e lembrete em agenda, além de consultar registros próximos e ver matches.
 
+**Telas**
+
+- Tela de Login
+
+![Tela de Login](./assets/screenshot-login.png)
+
+- Tela de Registro (câmera / formulário)
+
+![Registro - Câmera](./assets/screenshot-register.png)
+
+- Tela de Mapa com marcadores
+
+![Mapa - Registros](./assets/screenshot-map.png)
+
+- Tela de Lista de Registros / Matches
+
+![Lista - Matches](./assets/screenshot-list.png)
+
 
 **Sumário**
 - **Objetivo**
@@ -19,30 +37,27 @@ Aplicação desenvolvida com o propósito de ajudar a encontrar pets perdidos na
 
 
 **Requisitos (o que precisa estar instalado)**
-- **Node.js** (recomendado LTS). Verifique com `node -v`.
-- **npm** (vem com Node) ou **yarn**.
-- **Expo CLI** (não é obrigatório globalmente, usamos `npx expo` nas instruções): `npm i -g expo-cli` (opcional).
-- Para testes em dispositivo: **Expo Go** (Android/iOS) instalado no telefone, ou Android Studio / Xcode para emuladores.
+- **Node.js** (recomendado LTS). Verifique com `node --version`.
+- **Expo Go** para testes em dispositivos (Android/iOS) instalado no telefone, ou Android Studio / Xcode para emuladores.
 
 **Configuração (instalação)**
 1. Clone o Repositório 
+
+    No VsCode, no Terminal ou GitBash digite:
+ ```
+git clone https://github.com/Aonay/FindMyPet.git
+ ```
+
+
 2. Abra um terminal na raiz do projeto (`FindMyPet`).
+
 3. Instale dependências (apenas na primeira vez):
 
-```powershell
+```
 npm install
 ```
 
 4. Crie o arquivo de ambiente com as keys necessárias: `./.env.local` (detalhes abaixo).
-5. Inicie o Expo:
-
-- no terminal (crtl +j no vscode) 
-- se cli estiver como "powershell" altere para "cmd" digitanto cmd e dando enter (alguns comandos do expo não funcionam bem com powershell)
-
-```cmd
-npx expo start
-```
-
 
 **Arquivo de ambiente (.env.local)**
 Crie um arquivo chamado `.env.local` na raiz do projeto (NÃO comitar este arquivo). As variáveis usadas pelo projeto incluem (exemplo):
@@ -53,8 +68,16 @@ SUPABASE_ANON_KEY=eyJhbGciOi... (sua anon key)
 # Opcional (se estiver usando outras chaves):
 # SUPABASE_SERVICE_ROLE_KEY=...
 ```
-
 Substitua os valores acima pelas credenciais do seu projeto Supabase. Essas chaves permitem conexão com o banco remoto. Mantenha-as seguras e não as publique.
+
+5. Inicie o Expo:
+
+- no terminal (crtl +j no vscode) 
+- se cli estiver como "powershell" altere para "cmd" digitanto cmd e dando enter (alguns comandos do expo não funcionam bem com powershell)
+
+```
+npx expo start
+```
 
 **Principais bibliotecas / dependências**
 - **Expo** (`expo`) — base do projeto.
@@ -79,27 +102,6 @@ Estas dependências (exatas) estão listadas no `package.json` do projeto.
 - **Carrocel Match de registros**: sistema que compara registros e aponta possíveis correspondências (minimo 3 caracteristas em comum).
 - **Mapa com endereço**: exibição do mapa nos registros com marcador e endereço aproximado.(Clicando no edereço é aberto o google maps)
 
-Cada item acima tem espaço para capturas de tela — adicione imagens na pasta `assets/` e insira os links abaixo.
-
-**Espaço para prints**
-
-- Tela de Login
-
-![Tela de Login](./assets/screenshot-login.png)
-
-- Tela de Registro (câmera / formulário)
-
-![Registro - Câmera](./assets/screenshot-register.png)
-
-- Tela de Mapa com marcadores
-
-![Mapa - Registros](./assets/screenshot-map.png)
-
-- Tela de Lista de Registros / Matches
-
-![Lista - Matches](./assets/screenshot-list.png)
-
-Substitua os arquivos de exemplo acima por capturas reais para documentar o projeto.
 
 **Notas de desenvolvimento**
 - Não commit `./.env.local` — adicione-o ao `.gitignore` se ainda não estiver.
@@ -109,16 +111,17 @@ Substitua os arquivos de exemplo acima por capturas reais para documentar o proj
 **Comandos úteis**
 - `npm install` — instala dependências (primeira execução).
 - `npx expo start` ou `npm run start` — inicia o Metro/Expo.
-- `npm run android` — tenta abrir no Android.
+- `npm run android` — tenta abrir no Android.(Adroid Studio necessário)
 - `npm run ios` — tenta abrir no iOS (macOS/Xcode necessário).
 
-**Contato / autor**
-- Projeto: FindMyPet
-- Repositório/local: `e:/ALAN/Faculdade/FindMyPet`
+**Contatos / autores**
+ Projeto FindMyPet desenvolvido por:
+ Vitor Marvulle - [Linkedin](https://www.linkedin.com/in/vitormarvulle/) - [GitHub](https://github.com/VitorMarvulle)
+ Alan Matias - [Linkedin](https://github.com/Aonay) - [GitHub](https://www.linkedin.com/in/alanmmatias/)
 
----
+ Todos os direitos reservados
 
-Se quiser, posso também:
-- Gerar um `README` em versão em inglês.
-- Incluir badges (build, license) e um exemplo de `.env.local.example`.
-- Inserir imagens de exemplo reais (se você enviar capturas).
+
+
+
+
