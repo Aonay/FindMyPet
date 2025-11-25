@@ -1,6 +1,6 @@
 # FindMyPet
 
-**Descrição curta:** Aplicativo mobile em React Native (Expo) para ajudar a encontrar pets perdidos: permite registrar avistamentos com foto,registar pet perdido com foto, localização e lembrete em agenda, além de consultar registros próximos e ver matches.
+**Descrição curta:** Aplicativo mobile em React Native (Expo) para ajudar a encontrar pets perdidos: permite registrar encontrados com foto,registar pet perdido com foto, localização e lembrete em agenda, além de consultar registros próximos e ver matches.
 
 **Telas**
 

@@ -45,6 +45,9 @@ export function HomeCard({ record }: Props) {
         ) : (
           <Text style={styles.icon}>{statusIcon}</Text>
         )}
+        <View style={[styles.badge, { backgroundColor: statusColor }]}>
+          <Text style={styles.badgeText}>{status?.toUpperCase()}</Text>
+        </View>
       </View>
       <View style={styles.info}>
         <Text style={styles.title} numberOfLines={1}>
@@ -53,12 +56,9 @@ export function HomeCard({ record }: Props) {
         <Text style={styles.detail} numberOfLines={1}>
           {breed}
         </Text>
-        <Text style={styles.detail} numberOfLines={1}>
-          Dist: 2km
-        </Text>
-      </View>
-      <View style={[styles.badge, { backgroundColor: statusColor }]}>
-        <Text style={styles.badgeText}>{status?.toUpperCase()}</Text>
+        <View style={styles.locationContainer}>
+          <Text style={styles.locationText}>📍 2km</Text>
+        </View>
       </View>
     </View>
   );
@@ -66,28 +66,29 @@ export function HomeCard({ record }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    width: 180,
-    height: 240,
-    borderRadius: radii.lg,
+    width: 160,
+    borderRadius: radii.md,
     backgroundColor: colors.card,
-    overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 2,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: colors.border,
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    marginRight: spacing.md,
+    marginBottom: spacing.sm, // For shadow
   },
   iconContainer: {
     width: "100%",
-    height: 140,
+    height: 160, // Square aspect ratio
     backgroundColor: colors.accent,
     alignItems: "center",
     justifyContent: "center",
+    borderTopLeftRadius: radii.md,
+    borderTopRightRadius: radii.md,
+    overflow: "hidden",
   },
   image: {
     width: "100%",
@@ -97,29 +98,43 @@ const styles = StyleSheet.create({
     fontSize: 48,
   },
   info: {
-    padding: spacing.md,
+    padding: spacing.sm,
     gap: 2,
   },
   title: {
-    fontSize: typography.subtitle,
-    fontWeight: "bold",
+    fontSize: 14,
+    fontFamily: typography.fontFamily.bold,
     color: colors.textDark,
+    textTransform: "uppercase",
   },
   detail: {
-    fontSize: typography.caption,
+    fontSize: 12,
+    fontFamily: typography.fontFamily.medium,
+    color: colors.text,
+  },
+  locationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+    marginTop: 2,
+  },
+  locationText: {
+    fontSize: 11,
+    fontFamily: typography.fontFamily.regular,
     color: colors.text,
   },
   badge: {
     position: "absolute",
     top: spacing.sm,
-    right: spacing.sm,
-    paddingHorizontal: spacing.sm,
+    left: spacing.sm, // Moved to left
+    paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: radii.pill,
+    backgroundColor: colors.primary, // Default
   },
   badgeText: {
     fontSize: 10,
-    fontWeight: "700",
+    fontFamily: typography.fontFamily.bold,
     color: colors.white,
     letterSpacing: 0.5,
   },

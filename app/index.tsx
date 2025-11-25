@@ -23,6 +23,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !senha) {
@@ -57,40 +58,48 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Image
-            source={require("../assets/logo2.png")}
-            style={styles.logo}
-          />
-          <Text style={styles.title}>LOGIN</Text>
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <Image source={require("../assets/logo2.png")} style={styles.logo} />
+            <Text style={styles.title}>Entrar</Text>
+            <Text style={styles.subtitle}>Acesse sua conta para continuar</Text>
+          </View>
+
+          <View style={styles.form}>
+            <TextInputField
+              placeholder="Email"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+              editable={!isLoading}
+            />
+            <TextInputField
+              placeholder="Senha"
+              secureTextEntry
+              showPasswordToggle
+              value={senha}
+              onChangeText={setSenha}
+              editable={!isLoading}
+            />
+
+            <TouchableOpacity style={styles.forgot} disabled={isLoading} onPress={() => Alert.alert('Senha', 'Funcionalidade em breve') }>
+              <Text style={styles.forgotText}>Esqueci minha senha</Text>
+            </TouchableOpacity>
+
+            <PrimaryButton
+              label={isLoading ? "Entrando..." : "Entrar"}
+              onPress={handleLogin}
+              style={styles.primaryButton}
+            />
+
+            {isLoading && <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.md }} />}
+
+            <TouchableOpacity style={styles.registerRow} onPress={() => router.push('/register')}>
+              <Text style={styles.registerText}>Não tem uma conta? <Text style={styles.registerLink}>Cadastre-se</Text></Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <TextInputField
-          placeholder="Email"
-          autoCapitalize="none"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-          editable={!isLoading}
-        />
-        <TextInputField
-          placeholder="Senha"
-          secureTextEntry
-          value={senha}
-          onChangeText={setSenha}
-          editable={!isLoading}
-        />
-        <TouchableOpacity disabled={isLoading}>
-          <Text style={styles.linkMuted}>Esqueci minha senha</Text>
-        </TouchableOpacity>
-        <PrimaryButton
-          label={isLoading ? "Entrando..." : "Entrar"}
-          onPress={handleLogin}
-          style={styles.primaryButton}
-        />
-        {isLoading && <ActivityIndicator color={colors.primary} />}
-        <Link href="/register" style={styles.link}>
-          Cadastre-se
-        </Link>
       </View>
     </SafeAreaView>
   );
@@ -103,40 +112,73 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: spacing.xl,
+    paddingHorizontal: 24,
     justifyContent: "center",
-    gap: spacing.md,
+    alignItems: "center",
+    backgroundColor: colors.background,
   },
-  title: {
-    textAlign: "center",
-    fontSize: typography.title,
-    color: colors.primary,
-    fontWeight: "700",
-    marginBottom: spacing.lg,
+  card: {
+    width: "100%",
+    maxWidth: 480,
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 6,
   },
   header: {
     alignItems: "center",
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
   },
   logo: {
-    width: 140,
-    height: 140,
+    width: 96,
+    height: 96,
     resizeMode: "contain",
     marginBottom: spacing.sm,
-    borderRadius: 20,
+    borderRadius: 12,
   },
-  linkMuted: {
-    fontSize: typography.caption,
+  title: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: colors.primary,
+  },
+  subtitle: {
+    marginTop: 6,
+    fontSize: 14,
     color: colors.text,
-    textAlign: "center",
+  },
+  form: {
+    marginTop: spacing.md,
+    gap: spacing.md,
+  },
+  forgot: {
+    alignSelf: "flex-end",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  forgotText: {
+    color: colors.info,
+    fontSize: typography.caption,
   },
   primaryButton: {
     marginTop: spacing.md,
+    borderRadius: 14,
+    paddingVertical: 14,
   },
-  link: {
-    textAlign: "center",
-    color: colors.info,
-    fontSize: typography.body,
+  registerRow: {
     marginTop: spacing.md,
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  registerText: {
+    fontSize: typography.caption,
+    color: colors.text,
+  },
+  registerLink: {
+    color: colors.info,
+    fontWeight: "700",
   },
 });

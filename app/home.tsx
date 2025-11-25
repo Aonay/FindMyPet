@@ -13,8 +13,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { HomeCard } from "./components/HomeCard";
-import { PrimaryButton } from "./components/PrimaryButton";
-import { SectionHeader } from "./components/SectionHeader";
 import { colors, radii, spacing, typography } from "./constants/theme";
 import { useAuth } from "./context/AuthContext";
 import {
@@ -58,76 +56,73 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <View style={styles.avatar}>
+            <View style={styles.avatarContainer}>
               <Image
-                source={{ uri: "https://i.pravatar.cc/" }} // Placeholder avatar
+                source={{ uri: "https://i.pravatar.cc/150?img=68" }}
                 style={styles.avatarImage}
               />
             </View>
             <View>
-              <Text style={styles.welcomeLabel}>Bem vindo,</Text>
-              <Text style={styles.welcomeName}>{user?.nome || "Usuário"}!</Text>
+              <Text style={styles.welcomeLabel}>Bem-vindo,</Text>
+              <Text style={styles.welcomeName}>{user?.nome || "Usuário"}</Text>
             </View>
           </View>
           <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-            <Ionicons name="log-out-outline" size={24} color={colors.danger} />
+            <Ionicons name="log-out-outline" size={24} color={colors.textLight} />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.actionsRow}>
+        {/* Main Actions Row */}
+        <View style={styles.actionsContainer}>
           <TouchableOpacity
-            style={[styles.bigButton, { backgroundColor: colors.secondary }]}
+            style={[styles.actionButton, { backgroundColor: colors.primary }]}
             onPress={() => router.push("/register-loss")}
-            activeOpacity={0.9}
+            activeOpacity={0.8}
           >
-            <View style={styles.bigButtonIcon}>
-              <Text style={styles.bigButtonIconText}>🐶</Text>
+            <View style={styles.actionIconWrapper}>
+              <Text style={[styles.actionEmoji, { fontSize: 28 }]}>🐶</Text>
             </View>
-            <View>
-              <Text style={styles.bigButtonTitle}>Perdi meu pet</Text>
-            </View>
+            <Text style={styles.actionLabel}>Perdi</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.bigButton, { backgroundColor: colors.primary }]}
+            style={[styles.actionButton, { backgroundColor: colors.secondary }]}
             onPress={() => router.push("/register-encounter")}
-            activeOpacity={0.9}
+            activeOpacity={0.8}
           >
-            <View style={styles.bigButtonIcon}>
-              <Text style={styles.bigButtonIconText}>🔍</Text>
+            <View style={styles.actionIconWrapper}>
+              <Text style={styles.actionEmoji}>🔍</Text>
             </View>
-            <View>
-              <Text style={styles.bigButtonTitle}>Encontrei um pet</Text>
-            </View>
+            <Text style={styles.actionLabel}>Encontrei</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
-            style={[styles.bigButton, { backgroundColor: colors.info }]}
+            style={[styles.actionButton, { backgroundColor: colors.functional }]}
             onPress={() => router.push("/my-records")}
-            activeOpacity={0.9}
+            activeOpacity={0.8}
           >
-            <View style={styles.bigButtonIcon}>
-              <Text style={styles.bigButtonIconText}>📝</Text>
+            <View style={styles.actionIconWrapper}>
+              <Text style={styles.actionEmoji}>📝</Text>
             </View>
-            <View>
-              <Text style={styles.bigButtonTitle}>Meus Registros</Text>
-            </View>
+            <Text style={styles.actionLabel}>Registros</Text>
           </TouchableOpacity>
         </View>
 
+        {/* Lost Pets Feed */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Feed de Animais Perdidos</Text>
+            <Text style={styles.sectionTitle}>Animais Perdidos</Text>
+            <TouchableOpacity>
+              <Text style={styles.seeAll}>Ver todos</Text>
+            </TouchableOpacity>
           </View>
 
           {isLoading ? (
-            <ActivityIndicator
-              color={colors.primary}
-              size="large"
-              style={styles.loader}
-            />
+            <ActivityIndicator color={colors.primary} size="large" style={styles.loader} />
           ) : (
             <ScrollView
               horizontal
@@ -144,22 +139,27 @@ export default function HomeScreen() {
                         params: { recordId: record.id },
                       })
                     }
-                    activeOpacity={0.8}
+                    activeOpacity={0.9}
                   >
                     <HomeCard record={record} />
                   </TouchableOpacity>
                 ))
               ) : (
-                <Text style={styles.emptyText}>
-                  Nenhum registro próximo encontrado
-                </Text>
+                <Text style={styles.emptyText}>Nenhum registro próximo encontrado</Text>
               )}
             </ScrollView>
           )}
         </View>
 
+        {/* Nearby Matches */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Matchs Próximos</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Matches Próximos</Text>
+            <TouchableOpacity>
+              <Text style={styles.seeAll}>Ver todos</Text>
+            </TouchableOpacity>
+          </View>
+
           {matchRecords.length > 0 ? (
             <ScrollView
               horizontal
@@ -175,7 +175,7 @@ export default function HomeScreen() {
                       params: { recordId: record.id },
                     })
                   }
-                  activeOpacity={0.8}
+                  activeOpacity={0.9}
                 >
                   <HomeCard record={record} />
                 </TouchableOpacity>
@@ -197,80 +197,79 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: spacing.lg,
-    gap: spacing.xl,
+    paddingTop: spacing.xl,
+    gap: 40, // Increased spacing between sections
+    paddingBottom: 40,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: spacing.sm,
   },
   headerLeft: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
   },
-  welcomeLabel: {
-    fontSize: typography.body,
-    color: colors.text,
-  },
-  welcomeName: {
-    fontSize: typography.subtitle,
-    fontWeight: "bold",
-    color: colors.textDark,
-  },
-  avatar: {
+  avatarContainer: {
     width: 48,
     height: 48,
     borderRadius: 24,
     overflow: "hidden",
-    borderWidth: 2,
-    borderColor: colors.white,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   avatarImage: {
     width: "100%",
     height: "100%",
   },
+  welcomeLabel: {
+    fontSize: 12,
+    fontFamily: typography.fontFamily.regular,
+    color: colors.text,
+  },
+  welcomeName: {
+    fontSize: 16,
+    fontFamily: typography.fontFamily.bold,
+    color: colors.textDark,
+  },
   logoutButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#FEE2E2",
-    alignItems: "center",
-    justifyContent: "center",
+    padding: spacing.sm,
   },
-  actionsRow: {
+  actionsContainer: {
     flexDirection: "row",
-    gap: spacing.md,
-  },
-  bigButton: {
-    flex: 1,
-    height: 140,
-    borderRadius: radii.lg,
-    padding: spacing.md,
     justifyContent: "space-between",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
+    paddingHorizontal: spacing.sm,
+    marginTop: spacing.md,
   },
-  bigButtonIcon: {
-    alignSelf: "flex-start",
+  actionButton: {
+    width: 100,
+    height: 60, // Rectangular card
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative", // For absolute positioning of icon if needed, but we'll use negative margin for pop-out
+    overflow: "visible", // Allow icon to pop out
+    marginTop: 12, // Space for the pop-out icon
   },
-  bigButtonIconText: {
-    fontSize: 32,
+  actionIconWrapper: {
+    position: "absolute",
+    top: -15,
+    left: -5,
+    width: 40, // Increased to prevent clipping
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 20,
+  },
+  actionEmoji: {
+    fontSize: 24,
+    lineHeight: 28, // Prevent vertical clipping
+    textAlign: "center",
+  },
+  actionLabel: {
+    fontSize: 14,
+    fontFamily: typography.fontFamily.bold,
     color: colors.white,
-  },
-  bigButtonTitle: {
-    color: colors.white,
-    fontSize: typography.body,
-    fontWeight: "bold",
+    marginTop: 8, // Push text down slightly
   },
   section: {
     gap: spacing.md,
@@ -279,28 +278,32 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingHorizontal: 4,
+    marginBottom: spacing.xs,
   },
   sectionTitle: {
-    fontSize: typography.subtitle,
-    fontWeight: "bold",
-    color: "#1E40AF", // Dark blue for section titles
+    fontSize: 18,
+    fontFamily: typography.fontFamily.bold,
+    color: colors.textDark,
   },
   seeAll: {
-    fontSize: typography.caption,
-    color: colors.primary,
-    fontWeight: "600",
+    fontSize: 14,
+    fontFamily: typography.fontFamily.medium,
+    color: colors.functional,
   },
   carousel: {
-    gap: spacing.md,
     paddingRight: spacing.lg,
-    paddingBottom: spacing.sm, // For shadow
+    paddingBottom: spacing.md, // For shadow
+    paddingLeft: 4, // Align with header
   },
   loader: {
     marginVertical: spacing.xl,
   },
   emptyText: {
-    fontSize: typography.caption,
+    fontSize: 14,
+    fontFamily: typography.fontFamily.regular,
     color: colors.text,
     fontStyle: "italic",
+    marginLeft: 4,
   },
 });
