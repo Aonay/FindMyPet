@@ -1,15 +1,17 @@
 export const colors = {
-  background: "#F5F7FB",
+  background: "#FFFFFF", // Clean white
   card: "#FFFFFF",
-  primary: "#4CAF50", // Green for "Encontrei" / Primary actions
-  secondary: "#EF5350", // Red for "Perdi"
-  info: "#4285F4",
+  primary: "#FF7F50", // Coral (Lost/Urgency)
+  secondary: "#20B2AA", // Teal (Found/Hope)
+  functional: "#4A90E2", // Blue (Records/Links)
+  info: "#4A90E2",
   warning: "#F59E0B",
-  success: "#10B981",
-  danger: "#EF5350",
+  success: "#20B2AA",
+  danger: "#FF7F50",
   accent: "#F3F4F6",
-  textDark: "#1B2430",
-  text: "#6B7280",
+  textDark: "#333333", // Dark Grey
+  text: "#777777", // Medium Grey
+  textLight: "#999999",
   border: "#E5E7EB",
   white: "#FFFFFF",
 };
@@ -20,12 +22,13 @@ export const spacing = {
   md: 16,
   lg: 24,
   xl: 32,
+  xxl: 40,
 };
 
 export const radii = {
   sm: 8,
-  md: 16,
-  lg: 24,
+  md: 12, // Reduced from 16
+  lg: 16, // Reduced from 24
   pill: 999,
 };
 
@@ -34,4 +37,9 @@ export const typography = {
   subtitle: 20,
   body: 16,
   caption: 14,
+  fontFamily: {
+    regular: "Poppins_400Regular",
+    medium: "Poppins_500Medium",
+    bold: "Poppins_700Bold",
+  },
 };

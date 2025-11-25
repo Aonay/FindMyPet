@@ -14,15 +14,18 @@
     },
     "ios": {
       "supportsTablet": true,
-       "infoPlist": {
+      "infoPlist": {
         "NSCalendarsUsageDescription": "O app precisa acessar o calendário para criar eventos"
-  }
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff",
-        "permissions": ["READ_CALENDAR", "WRITE_CALENDAR"]
+        "permissions": [
+          "READ_CALENDAR",
+          "WRITE_CALENDAR"
+        ]
       },
       "edgeToEdgeEnabled": true
     },
@@ -30,7 +33,8 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font"
     ]
   }
 }
