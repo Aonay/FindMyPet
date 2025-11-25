@@ -193,18 +193,19 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.accent,
   },
   container: {
-    padding: spacing.lg,
-    paddingTop: spacing.xl,
-    gap: 40, // Increased spacing between sections
+    padding: spacing.md,
+    paddingTop: spacing.lg,
+    gap: 24, // Reduced spacing between sections
     paddingBottom: 40,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: spacing.xs,
   },
   headerLeft: {
     flexDirection: "row",
@@ -216,6 +217,8 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     overflow: "hidden",
+    borderWidth: 2,
+    borderColor: colors.white,
   },
   avatarImage: {
     width: "100%",
@@ -233,68 +236,89 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     padding: spacing.sm,
+    backgroundColor: colors.white,
+    borderRadius: radii.pill,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   actionsContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: spacing.sm,
-    marginTop: spacing.md,
+    gap: spacing.sm,
+    marginTop: spacing.xs,
   },
   actionButton: {
-    width: 100,
-    height: 60, // Rectangular card
-    borderRadius: 12,
+    flex: 1,
+    height: 54,
+    borderRadius: radii.md,
     justifyContent: "center",
     alignItems: "center",
-    position: "relative", // For absolute positioning of icon if needed, but we'll use negative margin for pop-out
-    overflow: "visible", // Allow icon to pop out
-    marginTop: 12, // Space for the pop-out icon
+    position: "relative",
+    overflow: "visible",
+    marginTop: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   actionIconWrapper: {
     position: "absolute",
-    top: -15,
-    left: -5,
-    width: 40, // Increased to prevent clipping
-    height: 40,
+    top: -10,
+    left: 6,
+    width: 28,
+    height: 28,
     justifyContent: "center",
     alignItems: "center",
     zIndex: 20,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 14,
   },
   actionEmoji: {
-    fontSize: 24,
-    lineHeight: 28, // Prevent vertical clipping
+    fontSize: 18,
+    lineHeight: 22,
     textAlign: "center",
   },
   actionLabel: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: typography.fontFamily.bold,
     color: colors.white,
-    marginTop: 8, // Push text down slightly
+    marginTop: 6,
   },
   section: {
-    gap: spacing.md,
+    backgroundColor: colors.white,
+    borderRadius: radii.lg,
+    paddingVertical: spacing.md,
+    paddingLeft: spacing.md,
+    gap: spacing.sm,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 4,
+    paddingRight: spacing.md,
     marginBottom: spacing.xs,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: typography.fontFamily.bold,
     color: colors.textDark,
   },
   seeAll: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: typography.fontFamily.medium,
     color: colors.functional,
   },
   carousel: {
-    paddingRight: spacing.lg,
-    paddingBottom: spacing.md, // For shadow
-    paddingLeft: 4, // Align with header
+    paddingRight: spacing.md,
+    paddingBottom: spacing.xs,
   },
   loader: {
     marginVertical: spacing.xl,
